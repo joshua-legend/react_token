@@ -6,55 +6,12 @@ const Login = () => {
   const [adminId, setAdminID] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleAdminCookieLogin = async (e: any) => {
-    e.preventDefault();
-
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/api/admin/login",
-        {
-          adminId,
-          password,
-        },
-        { withCredentials: true }
-      );
-
-      // 서버 응답 데이터
-      const apiResponse = response.data;
-
-      if (apiResponse.status === "success") {
-        // 로그인 성공 후 쿠키 확인
-        const jwtToken = Cookies.get("jwt-token");
-
-        if (jwtToken) {
-          console.log(
-            "Login successful and jwt-token is present in cookies:",
-            jwtToken
-          );
-        } else {
-          console.log("Login successful but jwt-token is not found in cookies");
-        }
-      } else {
-        console.error("Login failed:", apiResponse.data);
-      }
-    } catch (error: any) {
-      if (error.response) {
-        // 서버 응답이 있는 경우
-        const apiResponse = error.response.data;
-        console.error("Login failed:", apiResponse);
-      } else {
-        // 서버 응답이 없는 경우 (네트워크 오류 등)
-        console.error("Login failed:", error.message);
-      }
-    }
-  };
-
   const handleAdminLogin = async (e: any) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/admin/login",
+        "http://localhost:8082/api/admin/login",
         {
           adminId,
           password,
@@ -93,7 +50,7 @@ const Login = () => {
     const jwtToken = localStorage.getItem("jwt-token");
 
     try {
-      const response = await axios.get("http://localhost:8080/api/car/all", {
+      const response = await axios.get("http://localhost:8082/api/v1/coffees", {
         headers: {
           Authorization: `Bearer ${jwtToken}`,
           "Content-Type": "application/json",
@@ -107,6 +64,32 @@ const Login = () => {
       console.error("Error sending data:", error);
     }
   };
+
+  const handleRegister = async (event: any) => {
+    event.preventDefault();
+
+    const admin = {
+      adminId: adminId,
+      password: password,
+      nickname: "umm",
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8082/api/admin/register",
+        admin,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.log("Error adding admin");
+    }
+  };
+
   return (
     <div>
       <div>
@@ -128,7 +111,7 @@ const Login = () => {
       <button onClick={handleAdminLogin}>어드민 로그인하기</button>
       <button onClick={handleLogout}>로그아웃</button>
       <button onClick={handleCar}>자동차</button>
-      <button onClick={() => console.log(Cookies)}>zz</button>
+      <button onClick={handleRegister}>어드민 등록</button>
     </div>
   );
 };
